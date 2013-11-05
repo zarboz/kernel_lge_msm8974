@@ -95,7 +95,19 @@ static struct platform_device lcd_misc_device = {
 	.name = "lcd_misc_msm",
 	.id = 0,
 };
+#ifdef CONFIG_BRICKED_THERMAL
+static struct msm_thermal_data msm_thermal_pdata = {
+	.sensor_id = 0,
+	.poll_ms = 400,
+	.shutdown_temp = 83,
 
+	.allowed_mid_freq = 960000,
+
+	.allowed_low_high = 74,
+	.allowed_low_low = 68,
+	.allowed_low_freq = 1728000,
+};
+#endif
 void __init lge_add_lcd_misc_devices(void)
 {
 	platform_device_register(&lcd_misc_device);
@@ -129,7 +141,11 @@ void __init msm8974_add_drivers(void)
 	else
 		msm_clock_init(&msm8974_clock_init_data);
 	tsens_tm_init_driver();
+#ifdef CONFIG_BRICKED_THERMAL
+	msm_thermal_init(&msm_thermal_pdata);
+#else
 	msm_thermal_device_init();
+#endif
 #ifdef CONFIG_LGE_LCD_TUNING
 	lge_add_lcd_misc_devices();
 #endif
