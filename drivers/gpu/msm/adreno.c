@@ -79,7 +79,7 @@
 #define KGSL_LOG_LEVEL_DEFAULT 3
 
 static void adreno_start_work(struct work_struct *work);
-static void adreno_input_work(struct work_struct *work);
+
 
 /*
  * The default values for the simpleondemand governor are 90 and 5,
@@ -369,6 +369,9 @@ static struct input_handler adreno_input_handler = {
 	.name = "kgsl",
 	.id_table = adreno_input_ids,
 };
+
+/* Nice level for the higher priority GPU start thread */
+static unsigned int _wake_nice = -7;
 
 /**
  * adreno_perfcounter_init: Reserve kernel performance counters
@@ -2092,25 +2095,7 @@ static void adreno_start_work(struct work_struct *work)
 	set_user_nice(current, _wake_nice);
 
 	mutex_lock(&device->mutex);
-	/*
-	 *  If adreno start is already called, no need to call it again
-	 *  it can lead to unpredictable behavior if we try to start
-	 *  the device that is already started.
-	 *  Below is the sequence of events that can go bad without the check
-	 *  1) thread 1 calls adreno_start to be scheduled on high priority wq
-	 *  2) thread 2 calls adreno_start with normal priority
-	 *  3) thread 1 after checking the device to be in slumber state gives
-	 *     up mutex to be scheduled on high priority wq
-	 *  4) thread 2 after checking the device to be in slumber state gets
-	 *     the mutex and finishes adreno_start before thread 1 is scheduled
-	 *     on high priority wq.
-	 *  5) thread 1 gets scheduled on high priority wq and executes
-	 *     adreno_start again. This leads to unpredictable behavior.
-	 */
-	if (!test_bit(ADRENO_DEVICE_STARTED, &adreno_dev->priv))
-		_status = _adreno_start(adreno_dev);
-	else
-		_status = 0;
+	_status = _adreno_start(adreno_dev);
 	mutex_unlock(&device->mutex);
 }
 
@@ -2125,6 +2110,24 @@ static void adreno_start_work(struct work_struct *work)
  */
 static int adreno_start(struct kgsl_device *device, int priority)
 {
+	struct adreno_device *adreno_dev = ADRENO_DEVICE(device);
+
+	/* No priority (normal latency) call the core start function directly */
+	if (!priority)
+		return _adreno_start(adreno_dev);
+
+	/*
+	 * If priority is specified (low latency) then queue the work in a
+	 * higher priority work queue and wait for it to finish
+	 */
+	queue_work(adreno_wq, &adreno_dev->start_work);
+	mutex_unlock(&device->mutex);
+	flush_work(&adreno_dev->start_work);
+	mutex_lock(&device->mutex);
+
+	return _status;
+}
+
 	struct adreno_device *adreno_dev = ADRENO_DEVICE(device);
 
 	/* No priority (normal latency) call the core start function directly */
