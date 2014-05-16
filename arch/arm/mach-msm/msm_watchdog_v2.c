@@ -105,6 +105,7 @@ static void wdt_timer_set_timer0_base(void __iomem * iomem)
 static void pet_watchdog_work(struct work_struct *work);
 static void init_watchdog_work(struct work_struct *work);
 
+/*
 static void dump_cpu_alive_mask(struct msm_watchdog_data *wdog_dd)
 {
 	static char alive_mask_buf[MASK_SIZE];
@@ -112,6 +113,7 @@ static void dump_cpu_alive_mask(struct msm_watchdog_data *wdog_dd)
 						&wdog_dd->alive_mask);
 	printk(KERN_INFO "cpu alive mask from last pet %s\n", alive_mask_buf);
 }
+*/
 
 static int msm_watchdog_suspend(struct device *dev)
 {
@@ -340,6 +342,7 @@ static int msm_watchdog_remove(struct platform_device *pdev)
 	return 0;
 }
 
+/*
 static irqreturn_t wdog_bark_handler(int irq, void *dev_id)
 {
 	struct msm_watchdog_data *wdog_dd = (struct msm_watchdog_data *)dev_id;
@@ -363,8 +366,9 @@ static irqreturn_t wdog_bark_handler(int irq, void *dev_id)
 	mb();
 	__raw_writel(1, wdog_dd->base + WDT0_RST);
 	mb();
+*/
 	/* Delay to make sure bite occurs */
-	mdelay(1);
+/*	mdelay(1);
 	panic("Failed to cause a watchdog bite! - Falling back to kernel panic!");
 	return IRQ_HANDLED;
 }
@@ -374,7 +378,7 @@ static irqreturn_t wdog_ppi_bark(int irq, void *dev_id)
 	struct msm_watchdog_data *wdog_dd =
 			*(struct msm_watchdog_data **)(dev_id);
 	return wdog_bark_handler(irq, wdog_dd);
-}
+}*/
 
 static void configure_bark_dump(struct msm_watchdog_data *wdog_dd)
 {
@@ -422,7 +426,7 @@ static void init_watchdog_work(struct work_struct *work)
 	unsigned long delay_time;
 	int error;
 	u64 timeout;
-	int ret;
+/*	int ret;
 
 	if (wdog_dd->irq_ppi) {
 		wdog_dd->wdog_cpu_dd = alloc_percpu(struct msm_watchdog_data *);
@@ -434,6 +438,7 @@ static void init_watchdog_work(struct work_struct *work)
 		ret = request_percpu_irq(wdog_dd->bark_irq, wdog_ppi_bark,
 					"apps_wdog_bark",
 					wdog_dd->wdog_cpu_dd);
+
 		if (ret) {
 			dev_err(wdog_dd->dev, "failed to request bark irq\n");
 			free_percpu(wdog_dd->wdog_cpu_dd);
@@ -448,6 +453,7 @@ static void init_watchdog_work(struct work_struct *work)
 			return;
 		}
 	}
+*/
 	delay_time = msecs_to_jiffies(wdog_dd->pet_time);
 	wdog_dd->min_slack_ticks = UINT_MAX;
 	wdog_dd->min_slack_ns = ULLONG_MAX;
