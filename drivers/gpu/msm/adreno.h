@@ -200,8 +200,8 @@ struct adreno_device {
 	struct adreno_profile profile;
 	struct kgsl_memdesc pwron_fixup;
 	unsigned int pwron_fixup_dwords;
-
-	struct work_struct start_work;
+	struct adreno_dispatcher dispatcher;
+	struct adreno_busy_data busy_data;
 
 	struct work_struct start_work;
 	struct work_struct input_work;
