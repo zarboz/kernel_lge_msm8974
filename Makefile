@@ -248,8 +248,8 @@ CONFIG_SHELL := $(shell if [ -x "$$BASH" ]; then echo $$BASH; \
 
 HOSTCC       = gcc
 HOSTCXX      = g++
-HOSTCFLAGS   = -Wall -Wmissing-prototypes -Wstrict-prototypes -Ofast -fomit-frame-pointer -pipe -DNDEBUG -fgcse-las -floop-nest-optimize -flto
-HOSTCXXFLAGS = -pipe -DNDEBUG -Ofast -fgcse-las -floop-nest-optimize -flto
+HOSTCFLAGS   = -Wall -Wmissing-prototypes -Wstrict-prototypes -Ofast -fomit-frame-pointer -pipe -DNDEBUG -fgcse-las -floop-nest-optimize
+HOSTCXXFLAGS = -pipe -DNDEBUG -Ofast -fgcse-las -floop-nest-optimize
 
 # Decide whether to build built-in, modular, or both.
 # Normally, just do built-in.
@@ -349,7 +349,7 @@ CHECK		= sparse
 
 CHECKFLAGS     := -D__linux__ -Dlinux -D__STDC__ -Dunix -D__unix__ \
 		  -Wbitwise -Wno-return-void $(CF)
-KERNELFLAGS	= -pipe -DNDEBUG -Ofast -mtune=cortex-a15 -mcpu=cortex-a15 -marm -mfpu=neon-vfpv4 -ftree-vectorize -mvectorize-with-neon-quad -munaligned-access -fgcse-lm -fgcse-sm -fsingle-precision-constant -fforce-addr -fsched-spec-load -funroll-loops -fpredictive-commoning -floop-nest-optimize -flto
+KERNELFLAGS	= -pipe -DNDEBUG -Ofast -mtune=cortex-a15 -mcpu=cortex-a15 -marm -mfpu=neon-vfpv4 -ftree-vectorize -mvectorize-with-neon-quad -munaligned-access -fgcse-lm -fgcse-sm -fsingle-precision-constant -fforce-addr -fsched-spec-load -funroll-loops -fpredictive-commoning -floop-nest-optimize
 MODFLAGS	= -DMODULE $(KERNELFLAGS)
 CFLAGS_MODULE   = $(MODFLAGS)
 AFLAGS_MODULE   = $(MODFLAGS)
