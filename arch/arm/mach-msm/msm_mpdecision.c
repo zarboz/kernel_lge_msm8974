@@ -98,7 +98,7 @@ static struct msm_mpdec_tuners {
 #endif
 };
 
-static unsigned int NwNs_Threshold[8] = {12, 0, 25, 7, 30, 10, 0, 18};
+static unsigned int NwNs_Threshold[8] = {12, 0, 20, 7, 25, 10, 0, 18};
 static unsigned int TwTs_Threshold[8] = {140, 0, 140, 190, 140, 190, 0, 190};
 
 extern unsigned int get_rq_info(void);
@@ -458,6 +458,7 @@ static void mpdec_input_callback(struct work_struct *unused) {
 }
 
 #ifdef CONFIG_BRICKED_THERMAL
+extern int bricked_thermal_throttled;
 #endif
 
 static void mpdec_input_event(struct input_handle *handle, unsigned int type,
@@ -471,11 +472,10 @@ static void mpdec_input_event(struct input_handle *handle, unsigned int type,
 
 	if (!msm_mpdec_tuners_ins.boost_enabled)
 		return;
-		
+
 	if (!is_screen_on)
-		
-#ifdef CONFIG_BRICKED_THERMAL
 		return;
+
 	for_each_online_cpu(i) {
 		queue_work_on(i, mpdec_input_wq, &per_cpu(mpdec_input_work, i));
 	}
